@@ -2,7 +2,7 @@
 CHCP 65001
 setlocal EnableDelayedExpansion
 set PATH=%PATH%;%~dp0
-set BAT-XD_VER=0.0.2
+set BAT-XD_VER=0.0.3
 set nmd_VER=!BAT_NA_VER!
 set nmd_title=[WWW.NMBXD.COM][V!BAT-XD_VER!]
 set nmd_page_forumlist=
@@ -49,10 +49,11 @@ set nmd_page_thread=
 	more "%NA_TMP%\!showfile!"
 
 :th_id_act
-	set /p user_input=[ #^<Num:ID^> ^| send [String:text] ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
+	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
 	if /i "!user_input:~0,1!"=="#" set th_id=!user_input:~1! & goto :thread
 	if /i "!user_input!"=="ref" goto :showf
 	if /i "!user_input!"=="back" goto :getForumList
+	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :showf)
 	if /i "!user_input:~0,4!"=="page" (
 		if /i "!user_input:~5!"=="+" set /a nmd_page_showf+=1 & goto :showf
 		if /i "!user_input:~5!"=="-" if not "!nmd_page_showf!"=="1" set /a nmd_page_showf-=1 & goto :showf
@@ -75,10 +76,11 @@ set nmd_page_thread=
 	more "%NA_TMP%\!showfile!"
 
 :th_act
-	set /p user_input=[ #^<Num:ID^> ^| send [String:text] ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
+	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
 	if /i "!user_input!"=="ref" goto :thread
 	if /i "!user_input!"=="back" goto :showf
-		if /i "!user_input:~0,4!"=="page" (
+	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :thread)
+	if /i "!user_input:~0,4!"=="page" (
 		if /i "!user_input:~5!"=="+" set /a nmd_page_thread+=1 & goto :thread
 		if /i "!user_input:~5!"=="-" if not "!nmd_page_thread!"=="1" set /a nmd_page_thread-=1 & goto :thread
 		if not "!user_input:~5!" LSS "1" set nmd_page_thread=!user_input:~5! & goto :thread
