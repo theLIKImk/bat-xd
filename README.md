@@ -11,7 +11,8 @@
 (草，才发现有些变量名写错了（（（( ﾟ∀。)）））)  
 
 
-地址：https://www.nmbxd1.com/t/66799926
+串串地址：https://www.nmbxd1.com/t/66799926  
+GITHUB地址：https://github.com/theLIKImk/bat-xd  
 
-> BAT-XD V0.0.2  
-> NMD-CORE V0.0.2
+> BAT-XD V0.0.3  
+> NMD-CORE V0.0.3
