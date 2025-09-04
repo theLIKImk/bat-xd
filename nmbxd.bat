@@ -534,12 +534,11 @@ exit /b
 :curl-get
 	set val=%*
 	set val=%val:#S#=^^^&%
-	curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val% 
+	curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val%
 exit /b
 
 :curl-post
 	set val=%*
 	set val=%val:#S#=^^^&%
-	curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val% 
-	echo. curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val% >> curl.log
+	curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val%
 exit /b
