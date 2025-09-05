@@ -14,5 +14,5 @@
 串串地址：https://www.nmbxd1.com/t/66799926  
 GITHUB地址：https://github.com/theLIKImk/bat-xd  
 
-> BAT-XD V0.1.0 
-> NMD-CORE V0.0.3
+> BAT-XD V0.1.2
+> NMD-CORE V0.0.4
