@@ -1,0 +1,4 @@
+@echo off
+hideW
+%*
+exit
