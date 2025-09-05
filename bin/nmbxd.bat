@@ -1,7 +1,7 @@
 @echo off
 chcp 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.3
+set XD_CORE_VER=0.0.4
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
 set NA_curl_HEAD=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
@@ -110,6 +110,7 @@ exit /b 0
 	echo.getForumList
 	echo.help
 	echo.nmb-notice
+	echo.send ^<id^>
 	echo.showf ^<id^> [^<page^>]
 	echo.thread ^<id^> [^<page^>]
 	echo.
