@@ -2,16 +2,36 @@
 CHCP 65001
 setlocal EnableDelayedExpansion
 set PATH=%PATH%;%~dp0
-set BAT_XD_VER=0.1.2
+
+if not exist "!PIDMD_ROOT!config.ini" (
+	echo.创建配置......
+	echo.[BAT_XD]>"!PIDMD_ROOT!config.ini"
+	echo.USE_READ=read>>"!PIDMD_ROOT!config.ini"
+	echo.READ_LINE=30>>"!PIDMD_ROOT!config.ini"
+	echo.READ_PAGE_LINE=3>>"!PIDMD_ROOT!config.ini"
+	echo.>>"!PIDMD_ROOT!config.ini"
+	echo.# Cookie导入时请把每一个 %% 重复4遍>>"!PIDMD_ROOT!config.ini"
+	echo.COOKIE=>>"!PIDMD_ROOT!config.ini"
+)
+echo.载入设定......
+call loadcfg %PIDMD_ROOT%config.INI
+call nmbxd cookie !BAT_XD_COOKIE!
+
+set BAT_XD_VER=0.1.3
 set BAT_XD_NOW_READ=0
-set BAT_XD_READ_LINE=30
-set BAT_XD_READ_PAGE_LINE=3
+set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
+set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
 set nmd_VER=!BAT_XD_VER!
-set nmd_title=[WWW.NMBXD.COM][V!BAT_XD_VER!]
+set nmd_title=[!PIDMD_PRID!] [!BAT_XD_THIS_PID!] [WWW.NMBXD.COM] [V!BAT_XD_VER!]
 set nmd_page_forumlist=
 set nmd_page_showf=
 set nmd_page_thread=
 call pid
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+call 
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :notice
@@ -37,7 +57,7 @@ call pid
 :getForumList-show
 	if not exist "!PIDMD_ROOT!TMP\platelist.txt" goto :getForumList-show
 	cls
-	call read !PIDMD_ROOT!TMP\platelist.txt -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
+	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\platelist.txt -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :cf_id_act
 	set /p user_input=[ #^<Num:ID^> ^| ref ^| pu ^| pd ]:
@@ -108,7 +128,7 @@ exit /b
 :thread-show
 	if not exist "!PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE!" goto :thread-show
 	cls
-	call read !PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
+	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 
 :th_act
