@@ -3,16 +3,7 @@ CHCP 65001
 setlocal EnableDelayedExpansion
 set PATH=%PATH%;%~dp0
 
-if not exist "!PIDMD_ROOT!config.ini" (
-	echo.创建配置......
-	echo.[BAT_XD]>"!PIDMD_ROOT!config.ini"
-	echo.USE_READ=read>>"!PIDMD_ROOT!config.ini"
-	echo.READ_LINE=30>>"!PIDMD_ROOT!config.ini"
-	echo.READ_PAGE_LINE=3>>"!PIDMD_ROOT!config.ini"
-	echo.>>"!PIDMD_ROOT!config.ini"
-	echo.# Cookie导入时请把每一个 %% 重复4遍>>"!PIDMD_ROOT!config.ini"
-	echo.COOKIE=>>"!PIDMD_ROOT!config.ini"
-)
+if not exist "!PIDMD_ROOT!config.ini" call :config
 echo.载入设定......
 call loadcfg %PIDMD_ROOT%config.INI
 call nmbxd cookie !BAT_XD_COOKIE!
@@ -154,7 +145,15 @@ exit /b
 	echo.少女祈祷中......
 exit /b
 
-:readtxt
+:CONFIG
+	echo.Create setting......
+	echo.[BAT_XD]>"!PIDMD_ROOT!config.ini"
+	echo.USE_READ=read>>"!PIDMD_ROOT!config.ini"
+	echo.READ_PAGE_LINE=03>>"!PIDMD_ROOT!config.ini"
+	echo.READ_LINE=30>>"!PIDMD_ROOT!config.ini"
+	echo.>>"!PIDMD_ROOT!config.ini"
+	echo.# Cookie导入时请把每一个 %% 重复4遍>>"!PIDMD_ROOT!config.ini"
+	echo.COOKIE=>>"!PIDMD_ROOT!config.ini"
 goto :eof
 
 	
