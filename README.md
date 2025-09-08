@@ -21,6 +21,7 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 > NMD-CORE V0.0.4
 
 # 配置文件
+./bin/config.ini  
 ```
 [BAT_XD]
 USE_READ=read
@@ -29,5 +30,4 @@ READ_PAGE_LINE=03
 
 # Cookie导入时请把每一个 % 重复4遍
 COOKIE=
-
 ```
