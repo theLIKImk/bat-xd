@@ -17,5 +17,17 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 >[!TIP]  
 >导入饼干详情请查看 `.\bin\cookies.txt`
 
-> BAT-XD V0.1.2  
+> BAT-XD V0.1.3   
 > NMD-CORE V0.0.4
+
+# 配置文件
+```
+[BAT_XD]
+USE_READ=read
+READ_LINE=30
+READ_PAGE_LINE=03
+
+# Cookie导入时请把每一个 % 重复4遍
+COOKIE=
+
+```
