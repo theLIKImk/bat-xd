@@ -8,21 +8,23 @@ echo.载入设定......
 call loadcfg %PIDMD_ROOT%config.INI
 call nmbxd cookie !BAT_XD_COOKIE!
 
-set BAT_XD_VER=0.1.3
+set BAT_XD_VER=0.1.4
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
+if not defined PIDMD_PRID set PIDMD_PRID= / - / - / - / & set BAT_XD_THIS_PID= / 
 set nmd_VER=!BAT_XD_VER!
 set nmd_title=[!PIDMD_PRID!] [!BAT_XD_THIS_PID!] [WWW.NMBXD.COM] [V!BAT_XD_VER!]
 set nmd_page_forumlist=
 set nmd_page_showf=
 set nmd_page_thread=
 call pid
+del /f /s /q "%pidmd_root%TMP\na_task\*" >nul 2 >nul
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-call 
+
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :notice
@@ -40,7 +42,8 @@ call
 	title !nmd_title! 版面列表
 	set BAT_XD_NOW_READ=0
 	call :loading_text
-
+	
+	if exist "%PIDMD_ROOT%TMP\NA_TASK\task_get_gf" goto getForumList-show
 	del /f /s /q "!PIDMD_ROOT!TMP\platelist.txt" >nul
 
 	call pid /start solo hiderun.cmd nmbxd.bat getForumList
@@ -74,10 +77,12 @@ exit /b
 	set BAT_XD_SHOWF_FILE=showf_id_!showf_id!_page_!nmd_page_showf!_list.txt
 	
 	call :showf-getNAME !showf_id!
+	set show_id_name=!NAME!
 	
 	title !nmd_title!  !NAME!板块     第!nmd_page_showf!页
 	call :loading_text
 	
+	if exist "%PIDMD_ROOT%TMP\NA_TASK\task_get_sf_!showf_id!_page_!nmd_page_showf!" goto showf-show
 	del /f /s /q "!PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE!" >nul
 	call pid /start solo hiderun.cmd nmbxd.bat showf !showf_id! !nmd_page_showf!
 
@@ -88,7 +93,7 @@ exit /b
 	call read !PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :th_id_act
-	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
+	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ]:
 	if /i "!user_input:~0,1!"=="#" set th_id=!user_input:~1!& goto :thread
 	if /i "!user_input!"=="ref" goto :showf
 	if /i "!user_input!"=="back" goto :getForumList
@@ -100,6 +105,7 @@ exit /b
 	)
 	if /i "!user_input!"=="pu" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! - !BAT_XD_READ_PAGE_LINE! & GOTO :showf-show
 	if /i "!user_input!"=="pd" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! + !BAT_XD_READ_PAGE_LINE! & GOTO :showf-show
+	if /i "!user_input!"=="openweb" start https://www.nmbxd1.com/f/!show_id_name!?page=!nmd_page_showf! & GOTO :showf-show
 	goto :th_id_act
 	
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -113,6 +119,7 @@ exit /b
 	title !nmd_title!  NO.!th_id!    第!nmd_page_thread!页
 	call :loading_text
 	
+	if exist "%PIDMD_ROOT%TMP\NA_TASK\task_get_thrd_!th_id!_page_!nmd_page_thread!" goto thread-show
 	del /f /s /q "!PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE!" >nul
 	call pid /start solo hiderun.cmd nmbxd.bat thread !th_id! !nmd_page_thread!
 	
@@ -123,7 +130,7 @@ exit /b
 
 
 :th_act
-	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^>]:
+	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ]:
 	if /i "!user_input!"=="ref" goto :thread
 	if /i "!user_input!"=="back" goto :showf
 	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :thread)
@@ -134,6 +141,7 @@ exit /b
 	)
 	if /i "!user_input!"=="pu" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! - !BAT_XD_READ_PAGE_LINE! & GOTO :thread-show
 	if /i "!user_input!"=="pd" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! + !BAT_XD_READ_PAGE_LINE! & GOTO :thread-show
+	if /i "!user_input!"=="openweb" start https://www.nmbxd1.com/t/!th_id!?page=!nmd_page_thread! & GOTO :thread-show
 	goto :th_act
 	
 
@@ -142,7 +150,7 @@ exit /b
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 :loading_text
-	echo.少女祈祷中......
+	CALL RandomString
 exit /b
 
 :CONFIG
