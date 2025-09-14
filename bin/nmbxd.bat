@@ -1,15 +1,17 @@
 @echo off
 chcp 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.4
+set XD_CORE_VER=0.0.5
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
+set NA_TASK=%NA_TMP%NA_TASK\
 set NA_curl_HEAD=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
 set NA_Cookie=
 set NA_sep=#n#
 set NA_EXIT=0
 
 if not exist "%na_tmp%" mkdir "%na_tmp%"
+if not exist "%NA_TASK%" mkdir "%NA_TASK%"
 
 if /i "%1"=="getForumList" goto :getForumList
 if /i "%1"=="showf" goto :showf
@@ -125,6 +127,8 @@ exit /b 0
 	echo.4  Cookie输入空
 	echo.5  发送指定板块/ID空
 	echo.6  指定路径不存在
+	echo.7  任务创建出错
+	echo.8  任务结束出错
 	
 exit /b
 
@@ -132,6 +136,10 @@ exit /b
 :nmb-notice
 	::公告
 	::
+	
+	CALL :task_new task_get_notice
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
+	
 	set showfile=nmb-notice.txt
 	DEL /f /s /q "%NA_tmp%nmb-notice*" >nul
 	DEL /f /s /q "%NA_tmp%notice_content*" >nul
@@ -161,6 +169,10 @@ exit /b
 	echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 	
 	set notice_time=
+	
+	CALL :task_end task_get_notice
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 8
+	
 exit /b 0
 
 :thread
@@ -174,6 +186,9 @@ exit /b 0
 	set showfile=thread_!thread_id!_page_!thread_id_page!_list.txt
 	
 	DEL /f /s /q "%NA_tmp%thread_!thread_id!*" >nul
+	
+	CALL :task_new task_get_thrd_%thread_id%_page_%thread_id_page%
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
 	
 	REM 获取
 	call :curl-get https://api.nmb.best/api/thread?id=!thread_id!#s#page=!thread_id_page! --output "%NA_TMP%\thread_!thread_id!.tmp"
@@ -266,6 +281,9 @@ exit /b 0
 	)
 	
 :thread_end
+	CALL :task_end task_get_thrd_%thread_id%_page_%thread_id_page%
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 8
+
 	set thread_id=
 	set thread_id_page=
 	set thread_success=
@@ -292,6 +310,9 @@ exit /b !NA_EXIT!
 
 	del /f /s /q "%NA_TMP%\showf_id_!showf_id!*" >NUL
 	del /f /s /q "%NA_TMP%\po_*_content.txt" >NUL
+	
+	CALL :task_new task_get_sf_%showf_id%_page_%showf_id_page%
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
 	
 	REM 时间线处理
 	if /i "!showf_id:~0,1!"=="T" (
@@ -376,7 +397,11 @@ exit /b !NA_EXIT!
 		set po_sage=
 		set po_img=
 	)
-	:out_showf
+:out_showf
+	
+	CALL :task_end task_get_sf_%showf_id%_page_%showf_id_page%
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 8
+	
 	set po_id=
 	set po_user_hash=
 	set po_name=
@@ -431,7 +456,9 @@ exit /b
 	DEL /F /S /Q "%NA_TMP%\!showfile!" >NUL 2>NUL
 	DEL /F /S /Q "%NA_TMP%\platein.ini" >NUL 2>NUL
 	
-
+	CALL :task_new task_get_gf
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
+	
 	call :curl-get https://api.nmb.best/api/getForumList --output "%NA_TMP%\ForumList.tmp"
 	call :curl-get https://api.nmb.best/api/getTimelineList --output "%NA_TMP%\TimelineList.tmp"
 	type "%NA_TMP%\ForumList.tmp" | jq > "%NA_TMP%\ForumList.json"
@@ -503,6 +530,9 @@ exit /b
 		set parent_section_id=
 	)
 	:out_parent_section
+	
+	CALL :task_end task_get_gf
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 8
 exit /b 0
 
 :getForumList_subsection
@@ -537,6 +567,20 @@ exit /b 0
 	echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 	:out_subsection
 exit /b
+
+:task_new
+	SET NA_TMP_STR_1=%*
+	IF NOT defined NA_TMP_STR_1 exit /b 2
+	IF EXIST "%NA_TASK%\%*" exit /b 1
+	echo.>"%NA_TASK%\%*"
+EXIT /B 0
+
+:task_end
+	SET NA_TMP_STR_1=%*
+	IF NOT defined NA_TMP_STR_1 exit /b 2
+	IF NOT EXIST "%NA_TASK%\%*" exit /b 1
+	DEL /F /S /Q "%NA_TASK%\%*"
+EXIT /B 0
 
 :curl-get
 	set val=%*
