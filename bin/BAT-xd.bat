@@ -170,7 +170,7 @@ exit /b
 :CONFIG
 	echo.Create setting......
 	echo.[BAT_XD]>"!PIDMD_ROOT!config.ini"
-	echo.USE_READ=read>>"!PIDMD_ROOT!config.ini"
+	echo.USE_READ=read_test>>"!PIDMD_ROOT!config.ini"
 	echo.READ_PAGE_LINE=03>>"!PIDMD_ROOT!config.ini"
 	echo.READ_LINE=30>>"!PIDMD_ROOT!config.ini"
 	echo.>>"!PIDMD_ROOT!config.ini"
