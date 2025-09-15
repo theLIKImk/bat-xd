@@ -15,13 +15,13 @@
 GITHUB地址：https://github.com/theLIKImk/bat-xd  
 
 >[!TIP]  
->导入饼干详情请查看 `.\bin\cookies.txt`
+>导入饼干详情请查看 `.\bin\config.ini`
 
 > BAT-XD V0.1.5.1  
 > NMD-CORE V0.0.6.1  
 
 # 配置文件
-./bin/config.ini  
+.\bin\config.ini  
 ```
 [BAT_XD]
 USE_READ=read
