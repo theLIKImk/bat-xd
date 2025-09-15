@@ -10,11 +10,16 @@ call nmbxd cookie !BAT_XD_COOKIE!
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.5
+set BAT_XD_VER=0.1.5.1
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
 if not defined PIDMD_PRID set PIDMD_PRID= / - / - / - / & set BAT_XD_THIS_PID= / 
+if defined BAT_XD_NA_PROXY (
+	set NA_PROXY=%BAT_XD_NA_PROXY%
+	set /a BAT_XD_OUTTIME=%BAT_XD_OUTTIME% * 2
+)
+
 set nmd_VER=!BAT_XD_VER!
 set nmd_title=[!PIDMD_PRID!] [!BAT_XD_THIS_PID!] [WWW.NMBXD.COM] [V!BAT_XD_VER!]
 set nmd_page_forumlist=
@@ -168,6 +173,12 @@ exit /b
 	echo.USE_READ=read>>"!PIDMD_ROOT!config.ini"
 	echo.READ_PAGE_LINE=03>>"!PIDMD_ROOT!config.ini"
 	echo.READ_LINE=30>>"!PIDMD_ROOT!config.ini"
+	echo.>>"!PIDMD_ROOT!config.ini"
+	echo.# 代理范例:>>"!PIDMD_ROOT!config.ini"
+	echo.#>>"!PIDMD_ROOT!config.ini"
+	echo.# http://user:pwd@127.0.0.1:1234>>"!PIDMD_ROOT!config.ini"
+	echo.# http://127.0.0.1:1234>>"!PIDMD_ROOT!config.ini"
+	echo.NA_PROXY=>>"!PIDMD_ROOT!config.ini"
 	echo.>>"!PIDMD_ROOT!config.ini"
 	echo.# Cookie导入时请把每一个 %% 重复4遍>>"!PIDMD_ROOT!config.ini"
 	echo.COOKIE=>>"!PIDMD_ROOT!config.ini"
