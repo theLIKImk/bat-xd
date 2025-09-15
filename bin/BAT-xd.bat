@@ -10,7 +10,7 @@ call nmbxd cookie !BAT_XD_COOKIE!
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.5.1
+set BAT_XD_VER=0.1.6
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
@@ -99,7 +99,7 @@ exit /b
 	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "!PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE!" goto :showf-show
 	cls
-	call read !PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
+	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :th_id_act
 	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
