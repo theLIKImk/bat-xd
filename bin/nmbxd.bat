@@ -1,7 +1,7 @@
 @echo off
 chcp 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.6.1
+set XD_CORE_VER=0.0.7
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
 set NA_TASK=%NA_TMP%NA_TASK\
@@ -174,12 +174,12 @@ exit /b
 	for /f "delims=*" %%s in ('jj -i "%NA_TMP%\nmb-notice.json" content') do (echo.%%s>>"%NA_TMP%notice_content.txt")
 	for /f "delims=*" %%s in ('jj -i "%NA_TMP%\nmb-notice.json" date') do (set notice_time=%%s)
 	
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      NMDBXD   NOTICE>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
+	echo.	^|         ___>>"%NA_TMP%\!showfile!"
+	echo.	^| N   // ^|^|  \\>>"%NA_TMP%\!showfile!"
+	echo.	^|  M //  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|   B/   ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|  //\\  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^| //  \\ ^|^|__//        [欢迎]>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
@@ -247,12 +247,15 @@ exit /b 0
 	
 	::头部
 	::
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      NMDBXD ^> !thread_id! >>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      页码: !thread_id_page!>>"%NA_TMP%\!showfile!"
+	
+	echo.	^|         ___>>"%NA_TMP%\!showfile!"
+	echo.	^| N   // ^|^|  \\>>"%NA_TMP%\!showfile!"
+	echo.	^|  M //  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|   B/   ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|  //\\  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^| //  \\ ^|^|__//        ^> !thread_id!>>"%NA_TMP%\!showfile!"
+	echo.	^| >>"%NA_TMP%\!showfile!"
+	echo.	^| 页码: !thread_id_page!>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 	if "!po_sage!"=="1" (
@@ -313,6 +316,8 @@ exit /b 0
 		for /f "delims=*" %%s in (%NA_TMP%thread_!thread_id!_replies_!thread_replies_id!.txt) do (echo.	^| %%s>>"%NA_TMP%\!showfile!")
 		echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 		set thread_replies_id=
+		set thread_replies_img=
+		set thread_replies_img_ext=
 	)
 	
 :thread_end
@@ -326,6 +331,7 @@ exit /b 0
 	set thread_replies_name=
 	set thread_replies_now=
 	set thread_replies_img=
+	set thread_replies_img_ext=
 	set po_user_hash=
 	set po_name=
 	set po_title=
@@ -333,6 +339,8 @@ exit /b 0
 	set po_now=
 	set po_ReplyCount=
 	set po_sage=
+	set po_img=
+	set po_img_ext=
 exit /b !NA_EXIT!
 
 :showf
@@ -368,12 +376,15 @@ exit /b !NA_EXIT!
 	set plate_id=!%2!
 	call loadcfg "%NA_TMP%\plate_!plate_id!_!showf_id!_msg.ini"
 	
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      NMDBXD ^> !NAME!>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      页码: !showf_id_page!>>"%NA_TMP%\!showfile!"
+	
+	echo.	^|         ___>>"%NA_TMP%\!showfile!"
+	echo.	^| N   // ^|^|  \\>>"%NA_TMP%\!showfile!"
+	echo.	^|  M //  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|   B/   ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|  //\\  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^| //  \\ ^|^|__//        ^> !NAME!>>"%NA_TMP%\!showfile!"
+	echo.	^| >>"%NA_TMP%\!showfile!"
+	echo.	^| 页码: !showf_id_page!>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	if exist "%NA_TMP%plate_!plate_id!_!showf_id!_msg.txt" (
 		for /f "delims=*" %%s in (%NA_TMP%plate_!plate_id!_!showf_id!_msg.txt) do (echo.	^|      %%s>>"%NA_TMP%\!showfile!")
@@ -509,12 +520,12 @@ exit /b
 	type "%NA_TMP%\ForumList.tmp" | jq > "%NA_TMP%\ForumList.json"
 	type "%NA_TMP%\TimelineList.tmp" | jq > "%NA_TMP%\TimelineList.json"
 	
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|      WELCOME TO NMDBXD! >>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
-	echo.	^|>>"%NA_TMP%\!showfile!"
+	echo.	^|         ___>>"%NA_TMP%\!showfile!"
+	echo.	^| N   // ^|^|  \\>>"%NA_TMP%\!showfile!"
+	echo.	^|  M //  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|   B/   ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^|  //\\  ^|^|  ^|^|>>"%NA_TMP%\!showfile!"
+	echo.	^| //  \\ ^|^|__//        [板块列表]>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	echo.________^|__________________________________________________>>"%NA_TMP%\!showfile!"
 	echo. ID	^| 板块>>"%NA_TMP%\!showfile!"
