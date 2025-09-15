@@ -18,7 +18,7 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 >导入饼干详情请查看 `.\bin\config.ini`
 
 > BAT-XD V0.1.6  
-> NMD-CORE V0.0.6.1  
+> NMD-CORE V0.0.7
 
 # 配置文件
 .\bin\config.ini  
