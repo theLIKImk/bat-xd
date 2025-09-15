@@ -8,7 +8,9 @@ echo.载入设定......
 call loadcfg %PIDMD_ROOT%config.INI
 call nmbxd cookie !BAT_XD_COOKIE!
 
-set BAT_XD_VER=0.1.4
+set BAT_XD_OUTTIME=6000
+set BAT_XD_WAIT=0
+set BAT_XD_VER=0.1.5
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
@@ -32,7 +34,7 @@ del /f /s /q "%pidmd_root%TMP\na_task\*" >nul 2 >nul
 	call nmbxd.bat notice
 	cls
 	title !nmd_title! 公告  
-	more "!PIDMD_ROOT!TMP\nmb-notice.txt"
+	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\nmb-notice.txt -tf 18 0
 	pause >nul
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,6 +67,7 @@ del /f /s /q "%pidmd_root%TMP\na_task\*" >nul 2 >nul
 :showf-getNAME
 	call loadcfg "!PIDMD_ROOT!TMP\platein.ini"
 	set plate_id=!%1!
+	set /A BAT_XD_WAIT=0
 	call loadcfg "!PIDMD_ROOT!TMP\plate_!plate_id!_!showf_id!_msg.ini"
 exit /b
 
@@ -87,13 +90,14 @@ exit /b
 	call pid /start solo hiderun.cmd nmbxd.bat showf !showf_id! !nmd_page_showf!
 
 :showf-show
-	REM if not "!errorlevel!"=="0" echo.失败！ & pause & goto :getForumList
+	set /a BAT_XD_WAIT+=1
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "!PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE!" goto :showf-show
 	cls
 	call read !PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :th_id_act
-	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ]:
+	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
 	if /i "!user_input:~0,1!"=="#" set th_id=!user_input:~1!& goto :thread
 	if /i "!user_input!"=="ref" goto :showf
 	if /i "!user_input!"=="back" goto :getForumList
@@ -106,11 +110,13 @@ exit /b
 	if /i "!user_input!"=="pu" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! - !BAT_XD_READ_PAGE_LINE! & GOTO :showf-show
 	if /i "!user_input!"=="pd" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! + !BAT_XD_READ_PAGE_LINE! & GOTO :showf-show
 	if /i "!user_input!"=="openweb" start https://www.nmbxd1.com/f/!show_id_name!?page=!nmd_page_showf! & GOTO :showf-show
+	if /i "!user_input:~0,7!"=="openimg" start "" cmd /c nmbxd.bat openimg !user_input:~8! & GOTO :showf-show
 	goto :th_id_act
 	
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :thread
 	set user_input=
+	set /A BAT_XD_WAIT=0
 	set BAT_XD_NOW_READ=0
 	if not defined nmd_page_thread set nmd_page_thread=1
 	set BAT_XD_THREAD_FILE=thread_!th_id!_page_!nmd_page_thread!_list.txt
@@ -124,13 +130,15 @@ exit /b
 	call pid /start solo hiderun.cmd nmbxd.bat thread !th_id! !nmd_page_thread!
 	
 :thread-show
+	set /a BAT_XD_WAIT+=1
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :showf
 	if not exist "!PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE!" goto :thread-show
 	cls
 	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\!BAT_XD_THREAD_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 
 :th_act
-	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ]:
+	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
 	if /i "!user_input!"=="ref" goto :thread
 	if /i "!user_input!"=="back" goto :showf
 	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :thread)
@@ -142,6 +150,7 @@ exit /b
 	if /i "!user_input!"=="pu" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! - !BAT_XD_READ_PAGE_LINE! & GOTO :thread-show
 	if /i "!user_input!"=="pd" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! + !BAT_XD_READ_PAGE_LINE! & GOTO :thread-show
 	if /i "!user_input!"=="openweb" start https://www.nmbxd1.com/t/!th_id!?page=!nmd_page_thread! & GOTO :thread-show
+	if /i "!user_input:~0,7!"=="openimg" start "" cmd /c nmbxd.bat openimg !user_input:~8! & GOTO :thread-show
 	goto :th_act
 	
 
