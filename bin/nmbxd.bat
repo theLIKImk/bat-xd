@@ -1,10 +1,11 @@
 @echo off
 chcp 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.5
+set XD_CORE_VER=0.0.6
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
 set NA_TASK=%NA_TMP%NA_TASK\
+set NA_IMG=%NA_TMP%NA_IMG\
 set NA_curl_HEAD=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
 set NA_Cookie=
 set NA_sep=#n#
@@ -12,6 +13,7 @@ set NA_EXIT=0
 
 if not exist "%na_tmp%" mkdir "%na_tmp%"
 if not exist "%NA_TASK%" mkdir "%NA_TASK%"
+if not exist "%NA_IMG%" mkdir "%NA_IMG%"
 
 if /i "%1"=="getForumList" goto :getForumList
 if /i "%1"=="showf" goto :showf
@@ -20,14 +22,36 @@ if /i "%1"=="notice" goto :nmb-notice
 if /i "%1"=="help" goto :help
 if /i "%1"=="send" goto :send
 if /i "%1"=="cookie" goto :cookie
+if /i "%1"=="openimg" goto :openimg
 
 if /i "%NA_DEBUG%"=="true" goto :%1
 
 exit /b
 
-::todo
 
-:image
+:openimg
+	set thread_id=%2
+	if not defined thread_id echo ID为空! & exit /b 1
+	if not exist "%NA_IMG%img_!thread_id!.ini" echo 链接未生成 & exit /b 9
+	
+	CALL :task_new task_get_img_!thread_id!
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
+	
+	echo 获取CDN地址......
+	call :curl-get https://api.nmb.best/api/getCDNPath --output "%NA_TMP%\NmbxdImageCDNPath.tmp"
+	type "%NA_TMP%\NmbxdImageCDNPath.tmp" | jq > "%NA_TMP%\NmbxdImageCDNPath.json"
+	
+	for /f "delims=*" %%s in ('jj -i "%NA_TMP%NmbxdImageCDNPath.json" 0.url') do (set Nmb_ImgCDN_Url_Path=%%s)
+	
+	echo 下载图片中......
+	call loadcfg "%NA_IMG%img_!thread_id!.ini"
+	call :curl-get %Nmb_ImgCDN_Url_Path%image/!NA_IMG_PATH! --output "%NA_IMG%\img_!thread_id!!NA_IMG_EXT!"
+	
+	start "" "%NA_IMG%\img_!thread_id!!NA_IMG_EXT!"
+	
+	CALL :task_end task_get_img_!thread_id!
+	if not "%errorlevel%"=="0" echo.失败 & exit /b 8
+exit /b 0
 
 :send
 	set NA_send_name=
@@ -129,6 +153,7 @@ exit /b 0
 	echo.6  指定路径不存在
 	echo.7  任务创建出错
 	echo.8  任务结束出错
+	echo.9  图片链接未生成
 	
 exit /b
 
@@ -238,7 +263,12 @@ exit /b 0
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	echo.	^| 标题: !po_title!>>"%NA_TMP%\!showfile!"
 	echo.	^| 名字: !po_name!>>"%NA_TMP%\!showfile!"
-	if defined po_img echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!"
+	if defined po_img (
+		echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!"
+		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\thread_!thread_id!.json" ext') do (set po_img_ext=%%s)
+		echo.NA_IMG_PATH=!po_img!!po_img_ext!>"%NA_IMG%\img_!thread_id!.ini" 
+		echo.NA_IMG_EXT=!po_img_ext!>>"%NA_IMG%\img_!thread_id!.ini" 
+	)
 	echo.	^| . . . . . . . . . . . . . . . . . . . . . . . . .>>"%NA_TMP%\!showfile!"
 	echo.	^|>>"%NA_TMP%\!showfile!"
 	for /f "delims=*" %%s in (%NA_TMP%thread_!thread_id!_content.txt) do (echo.	^| %%s>>"%NA_TMP%\!showfile!")
@@ -271,7 +301,12 @@ exit /b 0
 			echo.	^|>>"%NA_TMP%\!showfile!"
 			echo.	^| 标题: !thread_replies_title!>>"%NA_TMP%\!showfile!"
 			echo.	^| 名字: !thread_replies_name!>>"%NA_TMP%\!showfile!"
-			if defined thread_replies_img echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!"
+			if defined thread_replies_img (
+				echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!"
+				for /f "delims=*" %%s in ('jj -i "%NA_TMP%\thread_!thread_id!.json" Replies.%%i.ext') do (set thread_replies_img_ext=%%s)
+				echo.NA_IMG_PATH=!thread_replies_img!!thread_replies_img_ext!>"%NA_IMG%\img_!thread_replies_id!.ini" 
+				echo.NA_IMG_EXT=!thread_replies_img_ext!>>"%NA_IMG%\img_!thread_replies_id!.ini" 
+			)
 			echo.	^| . . . . . . . . . . . . . . . . . . . . . . . . .>>"%NA_TMP%\!showfile!"
 			echo.	^|>>"%NA_TMP%\!showfile!"
 		)
@@ -375,7 +410,12 @@ exit /b !NA_EXIT!
 		echo.	^| 标题：!po_title!>>"%NA_TMP%\!showfile!" 
 		echo.	^| 名字：!po_name!>>"%NA_TMP%\!showfile!" 
 		echo.	^| 回复：!po_ReplyCount!个>>"%NA_TMP%\!showfile!" 
-		if defined po_img echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!" 
+		if defined po_img (
+			echo.	^| [ IMAGE ]>>"%NA_TMP%\!showfile!" 
+			for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" ext') do (set po_img_ext=%%s)
+			echo.NA_IMG_PATH=!po_img!!po_img_ext!>"%NA_IMG%\img_!po_id!.ini" 
+			echo.NA_IMG_EXT=!po_img_ext!>>"%NA_IMG%\img_!po_id!.ini" 
+		)
 		echo.	^| . . . . . . . . . . . . . . . . . . . . . . . . .>>"%NA_TMP%\!showfile!" 
 		echo.	^|>>"%NA_TMP%\!showfile!" 
 		for /f "delims=*" %%s in (%NA_TMP%po_!po_id!_content.txt) do (echo.	^| %%s>>"%NA_TMP%\!showfile!")
@@ -396,6 +436,7 @@ exit /b !NA_EXIT!
 		set po_ReplyCount=
 		set po_sage=
 		set po_img=
+		set po_img_ext=
 	)
 :out_showf
 	
@@ -421,7 +462,7 @@ exit /b !NA_EXIT!
 		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.id') do (set po_reply_id=%%s)
 		if not defined po_reply_id goto :out_showf_ReplyCount
 		
-		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.IMG') do (set po_reply_img=%%s)
+		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.img') do (set po_reply_img=%%s)
 		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.user_hash') do (set po_reply_user_hash=%%s)
 		for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.content') do (set po_reply_content=%%s & echo %%s>>"%NA_tmp%po_!po_reply_id!_reply_content.txt")
 		
@@ -429,6 +470,9 @@ exit /b !NA_EXIT!
 		
 		if defined po_reply_img (
 			echo.	^|  [ NO!po_reply_id! ^| !po_reply_user_hash! ] ^(I^) !po_reply_head_line!>>"%NA_TMP%\!showfile!" 
+			for /f "delims=*" %%s in ('jj -i "%NA_TMP%\showf_id_!showf_id!_po_!po_id!.json" Replies.%%j.ext') do (set po_reply_img_ext=%%s)
+			echo.NA_IMG_PATH=!po_reply_img!!po_reply_img_ext!>"%NA_IMG%\img_!po_reply_id!.ini" 
+			echo.NA_IMG_EXT=!po_reply_img_ext!>>"%NA_IMG%\img_!po_reply_id!.ini" 
 		) else (
 			echo.	^|  [ NO!po_reply_id! ^| !po_reply_user_hash! ] !po_reply_head_line!>>"%NA_TMP%\!showfile!" 
 		)
@@ -439,6 +483,7 @@ exit /b !NA_EXIT!
 		set po_reply_content=
 		set po_reply_head_line=
 		set po_reply_img=
+		set po_reply_img_ext=
 	)
 	:out_showf_ReplyCount
 exit /b
