@@ -1,7 +1,7 @@
 @echo off
 chcp 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.6
+set XD_CORE_VER=0.0.6.1
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
 set NA_TASK=%NA_TMP%NA_TASK\
@@ -630,11 +630,11 @@ EXIT /B 0
 :curl-get
 	set val=%*
 	set val=%val:#S#=^^^&%
-	curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val%
+	curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt --proxy "%NA_proxy%" %val%
 exit /b
 
 :curl-post
 	set val=%*
 	set val=%val:#S#=^^^&%
-	curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt %val%
+	curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b cookies.txt --proxy "%NA_proxy%" %val%
 exit /b
