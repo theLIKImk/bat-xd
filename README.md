@@ -17,14 +17,14 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 >[!TIP]  
 >导入饼干详情请查看 `.\bin\config.ini`
 
-> BAT-XD V0.1.6
+> BAT-XD V0.1.6  
 > NMD-CORE V0.0.6.1  
 
 # 配置文件
 .\bin\config.ini  
 ```
 [BAT_XD]
-USE_READ=read
+USE_READ=read_test
 READ_LINE=30
 READ_PAGE_LINE=03
 
