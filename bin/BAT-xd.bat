@@ -10,7 +10,7 @@ call nmbxd cookie !BAT_XD_COOKIE!
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.6
+set BAT_XD_VER=0.1.7
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
@@ -102,10 +102,11 @@ exit /b
 	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :th_id_act
-	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
+	set /p user_input=[ #^<Num:ID^> ^| send ^<Num:ID^> ^| send-m ^<Num:ID^> ^|  ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
 	if /i "!user_input:~0,1!"=="#" set th_id=!user_input:~1!& goto :thread
 	if /i "!user_input!"=="ref" goto :showf
 	if /i "!user_input!"=="back" goto :getForumList
+	if /i "!user_input:~0,6!"=="send-m" (call nmbxd.bat send-m !user_input:~7! & pause & goto :showf)
 	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :showf)
 	if /i "!user_input:~0,4!"=="page" (
 		if /i "!user_input:~5!"=="+" set /a nmd_page_showf+=1 & goto :showf
@@ -143,9 +144,10 @@ exit /b
 
 
 :th_act
-	set /p user_input=[send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
+	set /p user_input=[send ^<Num:ID^> ^| send-m ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
 	if /i "!user_input!"=="ref" goto :thread
 	if /i "!user_input!"=="back" goto :showf
+	if /i "!user_input:~0,6!"=="send-m" (call nmbxd.bat send-m !user_input:~7! & pause & goto :thread)
 	if /i "!user_input:~0,4!"=="send" (call nmbxd.bat send !user_input:~5! & pause & goto :thread)
 	if /i "!user_input:~0,4!"=="page" (
 		if /i "!user_input:~5!"=="+" set /a nmd_page_thread+=1 & goto :thread
@@ -185,4 +187,3 @@ exit /b
 goto :eof
 
 	
-
