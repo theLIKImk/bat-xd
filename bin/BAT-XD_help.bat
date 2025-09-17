@@ -16,7 +16,7 @@ pause>nul
 echo.
 echo.进行操作的时候要输入指定操作口令才能能进行，一般要求操作输入时候会显示如下内容：
 echo.
-echo.[ #^<Num:ID^> ^| send ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:_
+echo.[ #^<Num:ID^> ^| send ^<Num:ID^> ^| send-m ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:_
 echo.
 echo.注意：根据每个操作页面不同显示口令也不同，请根据实际显示口令操作。
 echo.
@@ -35,6 +35,7 @@ echo.	pd                  显示内容向上下
 echo.	pu                  显示内容向上翻页
 echo.	ref                 刷新显示页面
 echo.	send ^<Num:ID^>       输入左侧板块ID/串号发布串或者回复串
+echo.	send-m ^<Num:ID^>     同上，但是多行回复
 echo.
 echo.
 pause>nul
