@@ -1,7 +1,7 @@
 @echo off
-chcp 65001
+CHCP 65001
 setlocal EnableDelayedExpansion
-set XD_CORE_VER=0.0.7
+set XD_CORE_VER=0.0.8
 set NA_DIR=%~dp0
 set NA_TMP=%NA_DIR%TMP\
 set NA_TASK=%NA_TMP%NA_TASK\
@@ -21,6 +21,7 @@ if /i "%1"=="thread" goto :thread
 if /i "%1"=="notice" goto :nmb-notice
 if /i "%1"=="help" goto :help
 if /i "%1"=="send" goto :send
+if /i "%1"=="send-m" goto :send
 if /i "%1"=="cookie" goto :cookie
 if /i "%1"=="openimg" goto :openimg
 
@@ -81,11 +82,21 @@ exit /b 0
 	)
 	echo.
 	
+	set NA_send_FILE=%NA_TMP%\NA_send_content_%random:~0,1%%random:~0,1%%random:~0,1%%random:~0,1%.txt
 	set /p NA_send_title=标题:
 	set /p NA_send_name=名字:
 	set /p NA_send_Image_path=图片路径（不准带引号，为空不发送）:
 	set /p NA_send_Image_watermark=是否添加水印[N/y]:
-	set /p NA_send_content=正文内容:
+	
+	if /i "%1"=="send-m" (
+		echo.请在下面打开到记事本内输入想要回应的内容然后保存并关闭它！
+		echo.>nul
+		echo.请输入内容...>"!NA_send_FILE!"
+		start /wait notepad "!NA_send_FILE!"
+	) else (
+		set /p NA_send_content=正文内容:
+		echo !NA_send_content!>"!NA_send_FILE!"
+	)
 	
 	if /i "!NA_send_Image_watermark!"=="y" (
 		set NA_send_Image_watermark=True
@@ -98,24 +109,25 @@ exit /b 0
 	)
 	
 	
+	
 	if /i "!NA_send_type!"=="s" (
 		CALL :CURL-POST https://www.nmbxd.com/Home/Forum/doPostThread.html ^
 -F "fid=!NA_send_fid!" ^
 -F "title=\"!NA_send_title!\"" ^
 -F "name=\"!NA_send_name!\"" ^
--F "content=\"!NA_send_content!\"" ^
+-F "content=<!NA_send_FILE!" ^
 -F "water=\"!NA_send_Image_watermark!\"" !NA_send_Image_cli!
 	) else (
 		CALL :CURL-POST https://www.nmbxd.com/Home/Forum/doReplyThread.html ^
 -F "resto=\"!NA_send_resto!\"" ^
 -F "title=\"!NA_send_title!\"" ^
 -F "name=\"!NA_send_name!\"" ^
--F "content=\"!NA_send_content!\"" ^
+-F "content=<!NA_send_FILE!" ^
 -F "water=\"!NA_send_Image_watermark!\"" !NA_send_Image_cli!
 	)
 	
 	echo 执行完毕
-	
+	del /f /s /q "!NA_send_FILE!" > nul 2 >nul
 exit /b 0
 
 :cookie
@@ -139,6 +151,7 @@ exit /b 0
 	echo.help
 	echo.nmb-notice
 	echo.send ^<id^>
+	echo.send-m ^<id^>
 	echo.showf ^<id^> [^<page^>]
 	echo.thread ^<id^> [^<page^>]
 	echo.
