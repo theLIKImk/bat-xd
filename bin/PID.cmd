@@ -8,7 +8,7 @@ set PIDMD_DISABLE_RUN=true
 set LANG=zh
 :: DO NOT CHANG LANG STR
 set en_check_pid_info=INFO:
-set zh_check_pid_info=ĞÅÏ¢:
+set zh_check_pid_info=ä¿¡æ¯:
 
 if not exist "%PIDMD_ROOT%SYS\PID\" mkdir "SYS\PID"
 if not exist "%PIDMD_ROOT%SYS\PRID" mkdir "%PIDMD_ROOT%SYS\PRID"
@@ -63,7 +63,7 @@ exit /b 0
 		)
 	)
 	
-	::prid Éú³É
+	::prid ç”Ÿæˆ
 	set PIDMD_PRID=%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%
 
 	if DEFINED PID_START_PATH_SET (getpid %PID_START_PATH_SET%) else 	(
@@ -74,7 +74,7 @@ exit /b 0
 	
 	if "%PG_PID%"=="0" echo -ERR- Create fail & exit /b -1
 	
-	::prid Ğ´Èë
+	::prid å†™å…¥
 	echo %PG_PID%>"%PIDMD_ROOT%SYS\PRID\%PIDMD_PRID%"
 	
 	goto SET_PID_FILE
@@ -89,7 +89,7 @@ exit /b 0
 		echo COMVAL=%3 %4 %5 %6 %7 %8>>"%PIDMD_ROOT%SYS\PID\%3-%PG_PID%"
 	)
 	echo RELY_ON=%2>>"%PIDMD_ROOT%SYS\PID\%3-%PG_PID%"
-	start hiderun PID.cmd /check_pid %PG_PID% %2
+	start cmd /c  hiderun PID.cmd /check_pid %PG_PID% %2
 	
 	
 	set PID_START_PATH_SET=
@@ -117,7 +117,7 @@ exit /b 0
 			)
 		)
 		
-		::¼ì²âÄ¿±ê½ø³ÌÊÇ·ñ´æÔÚ
+		::æ£€æµ‹ç›®æ ‡è¿›ç¨‹æ˜¯å¦å­˜åœ¨
 		if DEFINED PIDMD_RELY_ON (
 			IF NOT EXIST "%PIDMD_ROOT%SYS\PID\*-%PIDMD_RELY_ON%" (
 				start hiderun call PID.cmd /killpid-f %PG_PID%
@@ -137,3 +137,4 @@ exit /b 0
 			exit /b
 		)
 	goto check_pid_loop
+
