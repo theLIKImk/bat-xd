@@ -26,6 +26,9 @@ echo.口令用法如下：
 echo.
 echo.	#^<Num:ID^>           输入左侧板块ID/串号来进入查看
 echo.	back                返回上一个操作页面
+echo.	config              打开配置文件
+echo.	help                帮助
+echo.	license             软件许可证
 echo.	openweb             在浏览器中打开
 echo.	openimg ^<Num:ID^>    查看图片
 echo.	back                返回上一个操作页面
@@ -167,3 +170,4 @@ echo.目前大概就是这样了，欢迎使用哦！
 echo.
 pause>nul
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+exit /b
