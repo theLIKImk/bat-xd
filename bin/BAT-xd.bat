@@ -10,7 +10,7 @@ call nmbxd cookie !BAT_XD_COOKIE!
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.7
+set BAT_XD_VER=0.1.7.1
 set BAT_XD_NOW_READ=0
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
@@ -61,11 +61,14 @@ del /f /s /q "%pidmd_root%TMP\na_task\*" >nul 2 >nul
 	call !BAT_XD_USE_READ! !PIDMD_ROOT!TMP\platelist.txt -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :cf_id_act
-	set /p user_input=[ #^<Num:ID^> ^| ref ^| pu ^| pd ]:
+	set /p user_input=[ #^<Num:ID^> ^| ref ^| pu ^| pd ^| help ^| config ^| license]:
 	if /i "!user_input:~0,1!"=="#" set showf_id=!user_input:~1!& goto :showf
 	if /i "!user_input!"=="ref" goto :getForumList
 	if /i "!user_input!"=="pu" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! - !BAT_XD_READ_PAGE_LINE! & GOTO :getForumList-show
 	if /i "!user_input!"=="pd" set /a BAT_XD_NOW_READ=!BAT_XD_NOW_READ! + !BAT_XD_READ_PAGE_LINE! & GOTO :getForumList-show
+	if /i "!user_input!"=="help" cls & chcp 936 & call BAT-XD_help.bat & chcp 65001 & GOTO :getForumList-show
+	if /i "!user_input!"=="license" call licenses.bat  & GOTO :getForumList-show
+	if /i "!user_input!"=="config" start "" "!PIDMD_ROOT!config.ini" & GOTO :getForumList-show
 	goto :cf_id_act
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
