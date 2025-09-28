@@ -17,7 +17,7 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 >[!TIP]  
 >导入饼干详情请查看 `.\bin\config.ini`
 
-> BAT-XD V0.1.7.2  
+> BAT-XD V0.1.8  
 > NMD-CORE V0.0.8  
 
 # 配置文件
@@ -25,8 +25,9 @@ GITHUB地址：https://github.com/theLIKImk/bat-xd
 ```
 [BAT_XD]
 USE_READ=read_test
+READ_PAGE_LINE=010
 READ_LINE=30
-READ_PAGE_LINE=03
+TMPDIR=%PIDMD_ROOT%\TMP\
 
 # 代理范例:
 #
@@ -35,5 +36,7 @@ READ_PAGE_LINE=03
 NA_PROXY=
 
 # Cookie导入时请把每一个 % 重复4遍
-COOKIE=
+# 值为"#Login"只会按照登陆脚本写入的饼干登录
+COOKIE=#Login
+
 ```
