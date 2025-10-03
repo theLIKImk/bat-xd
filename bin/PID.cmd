@@ -2,13 +2,13 @@
 REM Waring: MUST USE ANSI!
 set PIDMD_ROOT=%~dp0
 set PATH=%PATH%;%PIDMD_ROOT%
-set PM_VER=1.2.0-lite
+set PM_VER=1.2.1-lite
 set PIDMD_DISABLE_RUN=true
 
 set LANG=zh
 :: DO NOT CHANG LANG STR
 set en_check_pid_info=INFO:
-set zh_check_pid_info=ä¿¡æ¯:
+set zh_check_pid_info=ÐÅÏ¢:
 
 if not exist "%PIDMD_ROOT%SYS\PID\" mkdir "SYS\PID"
 if not exist "%PIDMD_ROOT%SYS\PRID" mkdir "%PIDMD_ROOT%SYS\PRID"
@@ -63,7 +63,7 @@ exit /b 0
 		)
 	)
 	
-	::prid ç”Ÿæˆ
+	::prid Éú³É
 	set PIDMD_PRID=%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%-%random:~-1%%random:~-1%%random:~-1%%random:~-1%
 
 	if DEFINED PID_START_PATH_SET (getpid %PID_START_PATH_SET%) else 	(
@@ -74,7 +74,7 @@ exit /b 0
 	
 	if "%PG_PID%"=="0" echo -ERR- Create fail & exit /b -1
 	
-	::prid å†™å…¥
+	::prid Ð´Èë
 	echo %PG_PID%>"%PIDMD_ROOT%SYS\PRID\%PIDMD_PRID%"
 	
 	goto SET_PID_FILE
@@ -89,7 +89,7 @@ exit /b 0
 		echo COMVAL=%3 %4 %5 %6 %7 %8>>"%PIDMD_ROOT%SYS\PID\%3-%PG_PID%"
 	)
 	echo RELY_ON=%2>>"%PIDMD_ROOT%SYS\PID\%3-%PG_PID%"
-	start cmd /c  hiderun PID.cmd /check_pid %PG_PID% %2
+	start cmd /c hiderun PID.cmd /check_pid %PG_PID% %2
 	
 	
 	set PID_START_PATH_SET=
@@ -117,7 +117,7 @@ exit /b 0
 			)
 		)
 		
-		::æ£€æµ‹ç›®æ ‡è¿›ç¨‹æ˜¯å¦å­˜åœ¨
+		::¼ì²âÄ¿±ê½ø³ÌÊÇ·ñ´æÔÚ
 		if DEFINED PIDMD_RELY_ON (
 			IF NOT EXIST "%PIDMD_ROOT%SYS\PID\*-%PIDMD_RELY_ON%" (
 				start hiderun call PID.cmd /killpid-f %PG_PID%
@@ -136,5 +136,9 @@ exit /b 0
 			start hiderun call PID.cmd /killpid %PG_PID%
 			exit /b
 		)
+		
+		if not exist "%PIDMD_ROOT%SYS\PRID\%PIDMD_PRID%" (
+			echo.%2>"%PIDMD_ROOT%SYS\PRID\%PIDMD_PRID%"
+		)
+		
 	goto check_pid_loop
-
