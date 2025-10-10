@@ -11,7 +11,7 @@ call pid
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.8
+set BAT_XD_VER=0.1.8.1
 set BAT_XD_NOW_READ=0
 
 if not defined BAT_XD_TMPDIR (
@@ -24,7 +24,12 @@ if not defined BAT_XD_TMPDIR (
 
 set /p BAT_XD_THIS_PID=<"!PIDMD_ROOT!SYS\PRID\!PIDMD_PRID!"
 set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
-if not defined PIDMD_PRID set PIDMD_PRID= / - / - / - / & set BAT_XD_THIS_PID= / 
+if not defined PIDMD_PRID (
+	set PIDMD_PRID= / - / - / - / 
+	set BAT_XD_THIS_PID= / 
+	echo 警告：非正常启动，可能会导致一点问题!
+	timeout 2 /NOBREAK >nul
+)
 if defined BAT_XD_NA_PROXY (
 	set NA_PROXY=%BAT_XD_NA_PROXY%
 	set /a BAT_XD_OUTTIME=%BAT_XD_OUTTIME% * 2
@@ -55,8 +60,9 @@ del /f /s /q "%BAT_XD_TMP%na_task\*" >nul 2 >nul
 :getForumList
 
 	cls
-	title !nmd_title! 版面列表
+	title !nmd_title! 版面列表    正在获取......
 	set BAT_XD_NOW_READ=0
+	set BAT_XD_WAIT=0
 	call :loading_text
 	
 	if exist "%BAT_XD_TMP%NA_TASK\task_get_gf" goto getForumList-show
@@ -65,8 +71,11 @@ del /f /s /q "%BAT_XD_TMP%na_task\*" >nul 2 >nul
 	call pid /start solo hiderun.cmd nmbxd.bat getForumList
 
 :getForumList-show
+	set /a BAT_XD_WAIT+=1
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "%BAT_XD_TMP%platelist.txt" goto :getForumList-show
 	cls
+	title !nmd_title! 版面列表
 	call !BAT_XD_USE_READ! %BAT_XD_TMP%platelist.txt -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :cf_id_act
@@ -100,7 +109,7 @@ exit /b
 	call :showf-getNAME !showf_id!
 	set show_id_name=!NAME!
 	
-	title !nmd_title!  !NAME!板块     第!nmd_page_showf!页
+	title !nmd_title!  !NAME!板块     正在获取......
 	call :loading_text
 	
 	if exist "%BAT_XD_TMP%NA_TASK\task_get_sf_!showf_id!_page_!nmd_page_showf!" goto showf-show
@@ -112,6 +121,7 @@ exit /b
 	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "%BAT_XD_TMP%!BAT_XD_SHOWF_FILE!" goto :showf-show
 	cls
+	title !nmd_title!  !NAME!板块     第!nmd_page_showf!页
 	call !BAT_XD_USE_READ! %BAT_XD_TMP%!BAT_XD_SHOWF_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 :th_id_act
@@ -141,7 +151,7 @@ exit /b
 	set BAT_XD_THREAD_FILE=thread_!th_id!_page_!nmd_page_thread!_list.txt
 
 	cls
-	title !nmd_title!  NO.!th_id!    第!nmd_page_thread!页
+	title !nmd_title!  NO.!th_id!    正在获取......
 	call :loading_text
 	
 	if exist "%BAT_XD_TMP%NA_TASK\task_get_thrd_!th_id!_page_!nmd_page_thread!" goto thread-show
@@ -153,6 +163,7 @@ exit /b
 	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :showf
 	if not exist "%BAT_XD_TMP%!BAT_XD_THREAD_FILE!" goto :thread-show
 	cls
+	title !nmd_title!  NO.!th_id!    第!nmd_page_thread!页
 	call !BAT_XD_USE_READ! %BAT_XD_TMP%!BAT_XD_THREAD_FILE! -tf !BAT_XD_READ_LINE! !BAT_XD_NOW_READ!
 
 
