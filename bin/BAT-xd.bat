@@ -1,6 +1,7 @@
 @echo off
 CHCP 65001
 setlocal EnableDelayedExpansion
+set USE_EnableDelayedExpansion=true
 set PATH=%PATH%;%~dp0
 
 if not exist "!PIDMD_ROOT!config.ini" call :config
@@ -11,7 +12,7 @@ call pid
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.8.1
+set BAT_XD_VER=0.1.8.2
 set BAT_XD_NOW_READ=0
 
 if not defined BAT_XD_TMPDIR (
@@ -87,7 +88,7 @@ del /f /s /q "%BAT_XD_TMP%na_task\*" >nul 2 >nul
 	if /i "!user_input!"=="help" cls & chcp 936 & call BAT-XD_help.bat & chcp 65001 & GOTO :getForumList-show
 	if /i "!user_input!"=="license" call licenses.bat & cd /d "%PIDMD_ROOT%" & GOTO :getForumList-show
 	if /i "!user_input!"=="config" start "" "!PIDMD_ROOT!config.ini" & GOTO :getForumList-show
-	if /i "!user_input!"=="login" del /f /s /q cookies.txt >nul & cls & call nmbxd-login & GOTO :getForumList-show
+	if /i "!user_input!"=="login" del /f /s /q cookies.txt >nul & cls & title !nmd_title! 内置登录 & call nmbxd login & GOTO :getForumList-show
 	goto :cf_id_act
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
