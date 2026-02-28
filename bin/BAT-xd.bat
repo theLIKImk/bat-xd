@@ -12,7 +12,7 @@ call pid
 
 set BAT_XD_OUTTIME=6000
 set BAT_XD_WAIT=0
-set BAT_XD_VER=0.1.8.2
+set BAT_XD_VER=0.1.8.3
 set BAT_XD_NOW_READ=0
 
 if not defined BAT_XD_TMPDIR (
@@ -28,7 +28,7 @@ set PIDMD_RELY_ON=!BAT_XD_THIS_PID!
 if not defined PIDMD_PRID (
 	set PIDMD_PRID= / - / - / - / 
 	set BAT_XD_THIS_PID= / 
-	echo 警告：非正常启动，可能会导致一点问题!
+	echo.  ^| 警告：非正常启动，可能会导致一点问题!
 	timeout 2 /NOBREAK >nul
 )
 if defined BAT_XD_NA_PROXY (
@@ -46,6 +46,18 @@ del /f /s /q "%BAT_XD_TMP%na_task\*" >nul 2 >nul
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+if /i "%1"=="/open_thread" (
+	set th_id=%2
+	set nmd_page_thread=%3
+	set bat_xd_open_thread=1
+	goto :thread
+)
+
+if /i "%1"=="/help" (
+	echo.call bat-xd /help
+	echo.call bat-xd /open_thread ^<thread_id^> [^<thread_page^>]
+	exit /b 0
+)
 
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -73,7 +85,7 @@ del /f /s /q "%BAT_XD_TMP%na_task\*" >nul 2 >nul
 
 :getForumList-show
 	set /a BAT_XD_WAIT+=1
-	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.  ^| 失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "%BAT_XD_TMP%platelist.txt" goto :getForumList-show
 	cls
 	title !nmd_title! 版面列表
@@ -101,6 +113,11 @@ exit /b
 
 :showf
 	
+	if defined bat_xd_open_thread (
+		set bat_xd_open_thread=
+		exit /b
+	)
+	
 	cls
 	set user_input=
 	set BAT_XD_NOW_READ=0
@@ -119,7 +136,7 @@ exit /b
 
 :showf-show
 	set /a BAT_XD_WAIT+=1
-	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :getForumList
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.  ^| 失败,请检测是否输入正确ID！ & pause & goto :getForumList
 	if not exist "%BAT_XD_TMP%!BAT_XD_SHOWF_FILE!" goto :showf-show
 	cls
 	title !nmd_title!  !NAME!板块     第!nmd_page_showf!页
@@ -161,7 +178,7 @@ exit /b
 	
 :thread-show
 	set /a BAT_XD_WAIT+=1
-	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.失败,请检测是否输入正确ID！ & pause & goto :showf
+	if "%BAT_XD_WAIT%"=="%BAT_XD_OUTTIME%" echo.  ^| 失败,请检测是否输入正确ID！ & pause & goto :showf
 	if not exist "%BAT_XD_TMP%!BAT_XD_THREAD_FILE!" goto :thread-show
 	cls
 	title !nmd_title!  NO.!th_id!    第!nmd_page_thread!页
@@ -169,7 +186,9 @@ exit /b
 
 
 :th_act
-	set /p user_input=[send ^<Num:ID^> ^| send-m ^<Num:ID^> ^| ref ^| back ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
+	if defined bat_xd_open_thread (set bat_xd_back_txt=exit) else (set bat_xd_back_txt=back)
+	set /p user_input=[send ^<Num:ID^> ^| send-m ^<Num:ID^> ^| ref ^| !bat_xd_back_txt! ^| pu ^| pd ^| page + ^| page - ^| page ^<Num:page^> ^| openweb ^| openimg ^<Num:ID^> ]:
+	if defined bat_xd_open_thread if /i "!user_input!"=="exit" goto :showf
 	if /i "!user_input!"=="ref" goto :thread
 	if /i "!user_input!"=="back" goto :showf
 	if /i "!user_input:~0,6!"=="send-m" (call nmbxd.bat send-m !user_input:~7! & pause & goto :thread)

@@ -3,12 +3,12 @@ CHCP 65001
 ::if not defined use_EnableDelayedExpansion (
 	setlocal EnableDelayedExpansion
 ::)
-set XD_CORE_VER=0.0.8.1
+set XD_CORE_VER=0.0.8.2
 set NA_DIR=%~dp0
 if not defined NA_TMP set NA_TMP=%NA_DIR%TMP\
 set NA_TASK=%NA_TMP%NA_TASK\
 set NA_IMG=%NA_TMP%NA_IMG\
-set NA_curl_HEAD=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+set NA_curl_HEAD=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0
 set NA_Cookie=
 set NA_sep=#n#
 set NA_EXIT=0
@@ -93,8 +93,8 @@ exit /b
 	for /f "eol=# tokens=1,6,7 delims=	" %%a in (cookies.txt) do (
 		if /i "%%a"=="www.nmbxd1.com" (
 			if /i "%%b"=="userhash" (
-				echo.www.nmbxd.com	FALSE	/	FALSE	1764252682	userhash	%%c>>cookies.txt
-				echo.api.nmb.best	FALSE	/	FALSE	1764252682	userhash	%%c>>cookies.txt
+				echo.www.nmbxd.com	FALSE	/	FALSE	0	userhash	%%c>>cookies.txt
+				echo.api.nmb.best	FALSE	/	FALSE	0	userhash	%%c>>cookies.txt
 			)
 		)
 	)
@@ -108,8 +108,8 @@ exit /b !NA_EXIT!
 
 :openimg
 	set thread_id=%2
-	if not defined thread_id echo ID为空! & exit /b 1
-	if not exist "%NA_IMG%img_!thread_id!.ini" echo 链接未生成 & exit /b 9
+	if not defined thread_id echo.  ^| ID为空! & exit /b 1
+	if not exist "%NA_IMG%img_!thread_id!.ini" echo.  ^| 链接未生成 & exit /b 9
 	
 	CALL :task_new task_get_img_!thread_id!
 	if not "%errorlevel%"=="0" echo.失败 & exit /b 7
@@ -171,7 +171,7 @@ exit /b 0
 		start /wait notepad "!NA_send_FILE!"
 	) else (
 		set /p NA_send_content=正文内容:
-		echo !NA_send_content!>"!NA_send_FILE!"
+		echo.!NA_send_content!>"!NA_send_FILE!"
 	)
 	
 	if /i "!NA_send_Image_watermark!"=="y" (
@@ -740,10 +740,12 @@ EXIT /B 0
 	set val=%*
 	set val=%val:#S#=^^^&%
 	curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b "%PIDMD_ROOT%cookies.txt" -c "%PIDMD_ROOT%cookies.txt" --proxy "%NA_proxy%" -s %val%
+	if defined NA_DEBUG_CURL echo [%date% %time%][GET][!errorlevel!] curl -X GET -L --compressed -H "%NA_curl_HEAD%" -b "%PIDMD_ROOT%cookies.txt" -c "%PIDMD_ROOT%cookies.txt" --proxy "%NA_proxy%" -s %val%>>NA_CURL_LOG.log
 exit /b
 
 :curl-post
 	set val=%*
 	set val=%val:#S#=^^^&%
 	curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b "%PIDMD_ROOT%cookies.txt" -c "%PIDMD_ROOT%cookies.txt" --proxy "%NA_proxy%" -s %val%
+	if defined NA_DEBUG_CURL echo [%date% %time%][POST][!errorlevel!] curl -X POST -L --compressed -H "%NA_curl_HEAD%" -b "%PIDMD_ROOT%cookies.txt" -c "%PIDMD_ROOT%cookies.txt" --proxy "%NA_proxy%" -s %val%>>NA_CURL_LOG.log
 exit /b
